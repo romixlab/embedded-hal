@@ -1,0 +1,15 @@
+[package]
+name = "embedded-dsi"
+version = "0.1.0"
+authors = [
+  "Roman Isaikin <romix.lab@gmail.com>"
+]
+edition = "2021"
+categories = ["embedded", "hardware-support", "no-std"]
+description = "Hardware Abstraction Layer implementation for DSI peripheral"
+keywords = ["dsi", "mipi", "hal", "embedded-hal"]
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/rust-embedded/embedded-hal"
+
+[dependencies]

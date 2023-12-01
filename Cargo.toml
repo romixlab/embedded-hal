@@ -10,4 +10,5 @@ members = [
     "embedded-io",
     "embedded-io-async",
     "embedded-io-adapters",
+    "embedded-dsi",
 ]
