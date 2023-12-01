@@ -7,8 +7,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+No unreleased changes
+
+## [v1.0.0-rc.2] - 2023-11-28
+
 - Minor document fixes.
 - Add #[inline] hints to most of `embedded-hal` functions.
+- pwm: rename `get_max_duty_cycle` to `max_duty_cycle`.
+- delay: Rename `DelayUs` to `DelayNs`
+- delay: Add `DelayNs::delay_ns()`
+- delay: Add default impls of `delay_ms` and `delay_us` based on `delay_ns`.
+- delay: Make the default impl of `delay_ms` more efficient, it now does less calls to the underlying `delay_ns` (previously `delay_us`).
+- spi: Rename `Operation::DelayUs` to `Operation::DelayNs`, with nanosecond precision.
 
 ## [v1.0.0-rc.1] - 2023-08-15
 
@@ -300,7 +310,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-rc.1...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-rc.2...HEAD
+[v1.0.0-rc.2]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-rc.1...v1.0.0-rc.2
 [v1.0.0-rc.1]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.11...v1.0.0-rc.1
 [v1.0.0-alpha.11]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.10...v1.0.0-alpha.11
 [v1.0.0-alpha.10]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.9...v1.0.0-alpha.10

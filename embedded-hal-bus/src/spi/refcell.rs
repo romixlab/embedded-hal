@@ -1,9 +1,10 @@
 use core::cell::RefCell;
-use embedded_hal::delay::DelayUs;
+use embedded_hal::delay::DelayNs;
 use embedded_hal::digital::OutputPin;
 use embedded_hal::spi::{ErrorType, Operation, SpiBus, SpiDevice};
 
 use super::DeviceError;
+use crate::spi::shared::transaction;
 
 /// `RefCell`-based shared bus [`SpiDevice`] implementation.
 ///
@@ -33,7 +34,7 @@ impl<'a, BUS, CS> RefCellDevice<'a, BUS, CS, super::NoDelay> {
     /// # Panics
     ///
     /// The returned device will panic if you try to execute a transaction
-    /// that contains any operations of type `Operation::DelayUs`.
+    /// that contains any operations of type [`Operation::DelayNs`].
     #[inline]
     pub fn new_no_delay(bus: &'a RefCell<BUS>, cs: CS) -> Self {
         Self {
@@ -56,34 +57,12 @@ impl<'a, Word: Copy + 'static, BUS, CS, D> SpiDevice<Word> for RefCellDevice<'a,
 where
     BUS: SpiBus<Word>,
     CS: OutputPin,
-    D: DelayUs,
+    D: DelayNs,
 {
     #[inline]
     fn transaction(&mut self, operations: &mut [Operation<'_, Word>]) -> Result<(), Self::Error> {
         let bus = &mut *self.bus.borrow_mut();
 
-        self.cs.set_low().map_err(DeviceError::Cs)?;
-
-        let op_res = operations.iter_mut().try_for_each(|op| match op {
-            Operation::Read(buf) => bus.read(buf),
-            Operation::Write(buf) => bus.write(buf),
-            Operation::Transfer(read, write) => bus.transfer(read, write),
-            Operation::TransferInPlace(buf) => bus.transfer_in_place(buf),
-            Operation::DelayUs(us) => {
-                bus.flush()?;
-                self.delay.delay_us(*us);
-                Ok(())
-            }
-        });
-
-        // On failure, it's important to still flush and deassert CS.
-        let flush_res = bus.flush();
-        let cs_res = self.cs.set_high();
-
-        op_res.map_err(DeviceError::Spi)?;
-        flush_res.map_err(DeviceError::Spi)?;
-        cs_res.map_err(DeviceError::Cs)?;
-
-        Ok(())
+        transaction(operations, bus, &mut self.delay, &mut self.cs)
     }
 }
